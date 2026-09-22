@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>英语阅读互动课件生成器 · 30秒拖进去，下课就能用</title>
+<meta name="description" content="把英语阅读题图片一键做成可互动的讲课件：逐句精读、做题互动、考点积累、做题技巧、打印PDF。免费体验，无需注册。">
+<style>
+  :root{
+    --primary:#15616d; --primary-2:#1b7a86; --primary-soft:#e7f1f2; --on-primary:#ffffff;
+    --bg:#eef1f5; --panel:#ffffff; --line:#e6eaf0; --ink:#1f2933; --sub:#5b6573;
+    --accent:#f0a23b; --accent-soft:#fff7ed; --accent-2:#fef3c7;
+    --ok:#16a34a; --bad:#dc2626;
+    --radius:16px; --radius-sm:10px;
+    --shadow:0 4px 14px rgba(16,24,40,.08); --shadow-sm:0 1px 2px rgba(16,24,40,.06),0 1px 3px rgba(16,24,40,.08);
+    --shadow-lg:0 20px 50px rgba(16,24,40,.18);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg); color:var(--ink); font-family:"PingFang SC","Microsoft YaHei",-apple-system,system-ui,sans-serif; line-height:1.65; -webkit-font-smoothing:antialiased;}
+  a{color:var(--primary); text-decoration:none}
+  a:hover{text-decoration:underline}
+  button{font-family:inherit}
+
+  /* ---------- 导航 ---------- */
+  nav.top{display:flex; align-items:center; justify-content:space-between; padding:14px 22px; background:rgba(255,255,255,.85); backdrop-filter:blur(8px); position:sticky; top:0; z-index:50; border-bottom:1px solid var(--line);}
+  .brand{display:flex; align-items:center; gap:10px; font-weight:800; color:var(--primary); font-size:17px;}
+  .brand .logo{width:32px; height:32px; border-radius:9px; background:linear-gradient(135deg,var(--primary),var(--primary-2)); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:16px; box-shadow:var(--shadow-sm);}
+  .nav-links{display:flex; gap:6px; align-items:center}
+  .nav-links a{padding:7px 13px; border-radius:999px; color:var(--sub); font-size:14px; font-weight:600;}
+  .nav-links a:hover{background:var(--primary-soft); color:var(--primary); text-decoration:none;}
+  .nav-links .cta{background:var(--primary); color:#fff; padding:7px 18px; border-radius:999px; box-shadow:var(--shadow-sm);}
+  .nav-links .cta:hover{background:var(--primary-2); color:#fff;}
+
+  /* ---------- Hero ---------- */
+  .hero{text-align:center; padding:60px 22px 30px; max-width:920px; margin:0 auto;}
+  .badge{display:inline-flex; gap:8px; align-items:center; background:var(--accent-soft); color:#b45309; padding:6px 14px; border-radius:999px; font-size:13px; font-weight:700; border:1px solid #fde68a;}
+  .hero h1{font-size:clamp(28px, 4.6vw, 44px); margin:18px 0 12px; font-weight:800; letter-spacing:.3px; line-height:1.25;}
+  .hero h1 .hl{background:linear-gradient(180deg,transparent 62%, var(--accent) 62%); padding:0 4px;}
+  .hero p.lead{font-size:clamp(15px,1.8vw,17px); color:var(--sub); margin:0 auto 24px; max-width:680px;}
+  .hero .cta-row{display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:6px;}
+  .btn{border:none; cursor:pointer; border-radius:999px; padding:13px 26px; font-size:15px; font-weight:700; display:inline-flex; align-items:center; gap:7px; transition:.15s;}
+  .btn-primary{background:linear-gradient(135deg,var(--primary),var(--primary-2)); color:#fff; box-shadow:var(--shadow);}
+  .btn-primary:hover{transform:translateY(-2px); box-shadow:var(--shadow-lg);}
+  .btn-ghost{background:#fff; color:var(--primary); border:1.5px solid var(--line); box-shadow:var(--shadow-sm);}
+  .btn-ghost:hover{border-color:var(--primary);}
+  .hero-stats{display:flex; gap:32px; justify-content:center; margin-top:34px; flex-wrap:wrap; color:var(--sub); font-size:14px;}
+  .hero-stats b{color:var(--primary); font-size:18px; display:block;}
+
+  /* ---------- 上传区 ---------- */
+  .upload-section{max-width:920px; margin:0 auto; padding:14px 22px 30px;}
+  .upload-card{background:var(--panel); border-radius:var(--radius); box-shadow:var(--shadow); padding:30px; border:1px solid var(--line);}
+  .upload-title{display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px;}
+  .upload-title h2{margin:0; font-size:20px; color:var(--ink);}
+  .upload-title .free-tag{background:var(--primary-soft); color:var(--primary); padding:6px 14px; border-radius:999px; font-size:13px; font-weight:700;}
+
+  .dropzone{
+    border:2.5px dashed #cfd6df; border-radius:14px; padding:46px 24px; text-align:center;
+    transition:.2s; background:#fbfcfe; cursor:pointer;
+  }
+  .dropzone:hover{border-color:var(--primary); background:var(--primary-soft);}
+  .dropzone.drag{border-color:var(--primary); background:var(--primary-soft); transform:scale(1.01);}
+  .dropzone .icon{font-size:42px; margin-bottom:10px;}
+  .dropzone .big{font-size:18px; font-weight:700; color:var(--ink); margin-bottom:6px;}
+  .dropzone .sub{color:var(--sub); font-size:14px;}
+  .dropzone .pick{display:inline-flex; align-items:center; gap:6px; margin-top:14px; padding:9px 18px; border-radius:999px; background:var(--primary); color:#fff; font-weight:700; cursor:pointer;}
+  .dropzone input[type=file]{display:none;}
+  .thumbs{display:flex; flex-wrap:wrap; gap:10px; margin-top:16px;}
+  .thumb{position:relative; width:96px; height:96px; border-radius:10px; overflow:hidden; border:1px solid var(--line); background:#fff;}
+  .thumb img{width:100%; height:100%; object-fit:cover; display:block;}
+  .thumb .rm{position:absolute; top:3px; right:3px; width:22px; height:22px; border:none; border-radius:50%; background:rgba(0,0,0,.6); color:#fff; cursor:pointer; font-size:13px; line-height:1;}
+  .actions{display:flex; gap:10px; margin-top:18px; flex-wrap:wrap;}
+  .actions .grow{flex:1}
+  .hint{font-size:12.5px; color:var(--sub); margin-top:10px;}
+
+  /* ---------- 进度 + 结果 ---------- */
+  .progress-card{margin-top:18px; background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:22px; box-shadow:var(--shadow-sm);}
+  .progress-card h3{margin:0 0 14px; font-size:16px; color:var(--ink); display:flex; gap:8px; align-items:center;}
+  .steps{display:grid; gap:10px;}
+  .step{display:flex; align-items:center; gap:10px; padding:10px 14px; border-radius:10px; background:#fbfcfe; border:1px solid var(--line); font-size:14px; color:var(--sub); transition:.2s;}
+  .step .ico{width:26px; height:26px; border-radius:50%; background:#e3e6eb; color:#fff; display:flex; align-items:center; justify-content:center; font-size:13px; flex:none;}
+  .step.active{background:var(--primary-soft); border-color:var(--primary); color:var(--primary); font-weight:700;}
+  .step.active .ico{background:linear-gradient(135deg,var(--primary),var(--primary-2));}
+  .step.done{background:#e7f8ee; border-color:var(--ok); color:#166534;}
+  .step.done .ico{background:var(--ok);}
+  .step.error{background:#fdecec; border-color:var(--bad); color:#991b1b;}
+  .step.error .ico{background:var(--bad);}
+  .spinner{width:14px; height:14px; border:2px solid rgba(255,255,255,.4); border-top-color:#fff; border-radius:50%; animation:spin .8s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* ---------- 结果预览 ---------- */
+  .result-card{margin-top:18px; background:var(--panel); border:1px solid var(--line); border-radius:14px; overflow:hidden; box-shadow:var(--shadow);}
+  .result-head{padding:16px 20px; background:linear-gradient(135deg,var(--primary),var(--primary-2)); color:#fff; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;}
+  .result-head h3{margin:0; font-size:17px;}
+  .result-head .tags{display:flex; gap:8px; flex-wrap:wrap;}
+  .result-head .tag{background:rgba(255,255,255,.2); padding:4px 10px; border-radius:999px; font-size:12px;}
+  .result-body{padding:18px 20px;}
+  .result-meta{display:flex; gap:18px; color:var(--sub); font-size:13px; margin-bottom:14px; flex-wrap:wrap;}
+  .result-meta b{color:var(--primary);}
+  .preview-frame{width:100%; height:520px; border:1px solid var(--line); border-radius:10px; background:#fff;}
+  .result-actions{display:flex; gap:10px; margin-top:16px; flex-wrap:wrap;}
+  .result-actions .btn{padding:11px 22px;}
+
+  /* ---------- 转化引导（用完免费次数后） ---------- */
+  .upsell{display:none; margin-top:18px; background:linear-gradient(120deg,#fff7ed,#fef3c7); border:1px solid #fde68a; border-radius:var(--radius); padding:26px; box-shadow:var(--shadow-sm);}
+  .upsell.show{display:block;}
+  .upsell h3{margin:0 0 10px; color:#b45309; font-size:19px; display:flex; gap:8px; align-items:center;}
+  .upsell-grid{display:grid; grid-template-columns:auto 1fr; gap:24px; align-items:center;}
+  .upsell .qr{width:170px; height:170px; background:#fff; border:1px solid #fde68a; border-radius:14px; display:flex; align-items:center; justify-content:center; overflow:hidden;}
+  .upsell .qr img{width:100%; height:100%; object-fit:contain;}
+  .upsell .qr .ph{color:var(--sub); font-size:13px; text-align:center; padding:12px;}
+  .upsell p{margin:6px 0; color:#7c2d12;}
+  .upsell ul{margin:10px 0; padding-left:18px; color:#7c2d12; font-size:14px;}
+  .upsell ul li{margin:4px 0;}
+  .upsell .bypass{margin-top:12px; font-size:12.5px; color:var(--sub);}
+  .upsell .bypass a{color:var(--primary); cursor:pointer;}
+
+  /* ---------- 功能特性 ---------- */
+  .features{max-width:1080px; margin:30px auto; padding:30px 22px;}
+  .features h2{text-align:center; font-size:26px; margin:0 0 28px;}
+  .feat-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:18px;}
+  .feat{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:22px; box-shadow:var(--shadow-sm); transition:.2s;}
+  .feat:hover{transform:translateY(-3px); box-shadow:var(--shadow);}
+  .feat .icon{width:46px; height:46px; border-radius:12px; background:var(--primary-soft); color:var(--primary); display:flex; align-items:center; justify-content:center; font-size:22px; margin-bottom:10px;}
+  .feat h4{margin:6px 0 4px; font-size:15.5px;}
+  .feat p{margin:0; color:var(--sub); font-size:13.5px; line-height:1.6;}
+
+  /* ---------- 隐私 + 流程 ---------- */
+  .privacy{max-width:920px; margin:10px auto 30px; padding:0 22px; color:var(--sub); font-size:13px; text-align:center;}
+
+  footer{padding:30px 22px 50px; text-align:center; color:var(--sub); font-size:13px;}
+  footer .small{font-size:12px; opacity:.75; margin-top:6px;}
+
+  /* ---------- toast ---------- */
+  .toast{position:fixed; left:50%; bottom:30px; transform:translateX(-50%) translateY(40px); background:var(--ink); color:#fff; padding:11px 22px; border-radius:999px; font-size:14px; opacity:0; transition:.25s; z-index:200; box-shadow:var(--shadow-lg);}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+
+  @media (max-width:680px){
+    .hero{padding:38px 18px 18px;}
+    .upload-card{padding:20px;}
+    .dropzone{padding:32px 16px;}
+    .upsell-grid{grid-template-columns:1fr;}
+    .upsell .qr{margin:0 auto;}
+  }
+</style>
+</head>
+<body>
+
+<nav class="top">
+  <div class="brand"><div class="logo">阅</div>阅读互动课件</div>
+  <div class="nav-links">
+    <a href="#features">功能</a>
+    <a href="/sample" target="_blank">查看示例</a>
+    <a href="#upload" class="cta">立即体验</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <span class="badge">🎉 免费体验 · 无需注册</span>
+  <h1>把英语阅读题图片，<br>一键做成<span class="hl">可互动的讲课件</span></h1>
+  <p class="lead">支持逐句精读、做题互动、考点积累、做题技巧、打印学生版/教师版。<br>老师不加班，学生抢着答。</p>
+  <div class="cta-row">
+    <a href="#upload" class="btn btn-primary">📤 立即上传图片</a>
+    <a href="/sample" target="_blank" class="btn btn-ghost">👀 看一眼成品效果</a>
+  </div>
+  <div class="hero-stats">
+    <div><b>30s</b>生成一份课件</div>
+    <div><b>0</b>门槛 · 不注册</div>
+    <div><b>4 篇</b>一次最多处理</div>
+    <div><b>100%</b>本地离线可用</div>
+  </div>
+</section>
+
+<section class="upload-section" id="upload">
+  <div class="upload-card">
+    <div class="upload-title">
+      <h2>📤 上传英语阅读题图片</h2>
+      <span class="free-tag" id="freeTag">🎁 今日还可免费 3 次</span>
+    </div>
+
+    <label class="dropzone" id="drop">
+      <div class="icon">📷</div>
+      <div class="big">把图片拖到这里，或点击选择</div>
+      <div class="sub">支持 JPG / PNG / WebP，单张 ≤ 10MB，可一次拖多张</div>
+      <span class="pick">选择图片</span>
+      <input type="file" id="files" multiple accept="image/*">
+    </label>
+
+    <div class="thumbs" id="thumbs"></div>
+
+    <div class="actions">
+      <button class="btn btn-primary grow" id="goBtn" disabled>⚡ 一键生成课件</button>
+      <button class="btn btn-ghost" id="clearBtn" style="display:none">🗑 清空</button>
+    </div>
+    <div class="hint">🔒 图片仅用于本次识别，生成完成后立即从服务端丢弃，不留存任何学生材料。</div>
+  </div>
+
+  <!-- 进度 -->
+  <div class="progress-card" id="progressCard" style="display:none">
+    <h3>🤖 正在生成中</h3>
+    <div class="steps">
+      <div class="step" id="st1"><div class="ico">1</div>上传图片到服务器</div>
+      <div class="step" id="st2"><div class="ico">2</div>视觉大模型识别阅读题（OCR + 结构化）</div>
+      <div class="step" id="st3"><div class="ico">3</div>渲染成互动讲课件 HTML</div>
+      <div class="step" id="st4"><div class="ico">✓</div>完成，准备下载</div>
+    </div>
+  </div>
+
+  <!-- 结果 -->
+  <div class="result-card" id="resultCard" style="display:none">
+    <div class="result-head">
+      <h3>🎉 课件已生成</h3>
+      <div class="tags"><span class="tag" id="rTagA">A 篇</span></div>
+    </div>
+    <div class="result-body">
+      <div class="result-meta">
+        <div>📚 篇章 <b id="rPassages">0</b></div>
+        <div>✏️ 题目 <b id="rQs">0</b></div>
+        <div>⏱ 用时 <b id="rTime">—</b></div>
+      </div>
+      <iframe class="preview-frame" id="preview"></iframe>
+      <div class="result-actions">
+        <a class="btn btn-primary" id="dlBtn">⬇️ 下载 HTML（双击即用）</a>
+        <button class="btn btn-ghost" id="againBtn">🔁 再来一份</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 转化引导（3 次后） -->
+  <div class="upsell" id="upsell">
+    <h3>🎁 解锁无限次 + 教师交流群</h3>
+    <div class="upsell-grid">
+      <div class="qr"><img src="" alt="" id="qrImg" style="display:none"><div class="ph" id="qrPh">联系作者<br>获取最新群二维码</div></div>
+      <div>
+        <p>3 次免费体验已用完，加入「英语老师 AI 备课交流群」即可：</p>
+        <ul>
+          <li>✅ 无限次生成，无任何限制</li>
+          <li>✅ 优先体验新功能（多词批打印、考纲词库…）</li>
+          <li>✅ 与全国英语老师交流备课经验</li>
+          <li>✅ 一对一答疑</li>
+        </ul>
+        <div class="bypass">
+          已经是群成员？<a id="resetCounter">点这里重置体验次数</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="features" id="features">
+  <h2>为什么老师都在用</h2>
+  <div class="feat-grid">
+    <div class="feat"><div class="icon">⚡</div><h4>30 秒出课件</h4><p>拖图进去，AI 自动 OCR + 结构化 + 排版，下载即用，再也不用手打题。</p></div>
+    <div class="feat"><div class="icon">🖱️</div><h4>学生抢着答</h4><p>点击选项判对错、对/错可视化反馈、定位原文高亮——课堂不再死气沉沉。</p></div>
+    <div class="feat"><div class="icon">📝</div><h4>逐句精读</h4><p>点原文任一句，弹出该句翻译 + 结构拆解，比传统翻译更细。</p></div>
+    <div class="feat"><div class="icon">💡</div><h4>做题技巧</h4><p>针对每篇体裁自动给出应试策略（定位原文、同义替换、排除绝对化等）。</p></div>
+    <div class="feat"><div class="icon">🖨️</div><h4>打印学生版/教师版</h4><p>一键导出 PDF：学生作业纸（不带翻译）/ 教师讲解版（带翻译）。</p></div>
+    <div class="feat"><div class="icon">🔒</div><h4>本地存储 + 可编辑</h4><p>所有内容自动存到浏览器 LocalStorage，老师可在线随时补充、批注、留白。</p></div>
+  </div>
+</section>
+
+<div class="privacy">
+  🔒 <b>隐私承诺</b>：图片仅用于本次识别，识别完成立即从服务端删除，不留存任何学生材料。<br>
+  生成的 HTML 课件 100% 在你本地浏览器运行，无追踪、无广告。
+</div>
+
+<footer>
+  <div>© 2026 阅读互动课件生成器 · 让 AI 帮老师省下 30 分钟备课时间</div>
+  <div class="small">当前模型：智谱 glm-4v · 部署在 Vercel</div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const FREE_KEY = "webapp_free_uses";
+const MAX_FREE = 3;
+const $ = id => document.getElementById(id);
+
+function getUses(){ return +localStorage.getItem(FREE_KEY) || 0; }
+function addUse(n=1){ const u = getUses()+n; localStorage.setItem(FREE_KEY, u); return u; }
+function resetUses(){ localStorage.removeItem(FREE_KEY); renderFree(); }
+function renderFree(){
+  const used = getUses();
+  const left = Math.max(0, MAX_FREE - used);
+  $("freeTag").textContent = left > 0 ? `🎁 今日还可免费 ${left} 次` : "✅ 已体验免费额度";
+  if (used >= MAX_FREE) $("upsell").classList.add("show");
+  else $("upsell").classList.remove("show");
+}
+renderFree();
+$("resetCounter").onclick = () => { if(confirm("确认重置免费次数？")) resetUses(); };
+
+// ----- 文件选择 -----
+let pickedFiles = [];
+const dz = $("drop"), input = $("files"), thumbs = $("thumbs");
+
+input.addEventListener("change", e => addFiles([...e.target.files]));
+["dragenter","dragover"].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.add("drag")}));
+["dragleave","drop"].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.remove("drag")}));
+dz.addEventListener("drop", e => addFiles([...e.dataTransfer.files].filter(f=>f.type.startsWith("image/"))));
+
+function addFiles(fs){
+  for (const f of fs){
+    if (pickedFiles.length >= 8){ toast("最多 8 张图"); break; }
+    if (f.size > 10*1024*1024){ toast(`${f.name} 超过 10MB`); continue; }
+    pickedFiles.push(f);
+  }
+  renderThumbs();
+}
+function renderThumbs(){
+  thumbs.innerHTML = pickedFiles.map((f,i)=>{
+    const url = URL.createObjectURL(f);
+    return `<div class="thumb"><img src="${url}"><button class="rm" data-i="${i}">×</button></div>`;
+  }).join("");
+  thumbs.querySelectorAll(".rm").forEach(b => b.onclick = () => { pickedFiles[+b.dataset.i] = null; pickedFiles = pickedFiles.filter(Boolean); renderThumbs(); });
+  $("goBtn").disabled = pickedFiles.length === 0;
+  $("clearBtn").style.display = pickedFiles.length ? "inline-flex" : "none";
+}
+$("clearBtn").onclick = () => { pickedFiles = []; renderThumbs(); input.value=""; };
+
+// ----- 生成 -----
+let startTs = 0;
+$("goBtn").onclick = async () => {
+  if (!pickedFiles.length) return;
+  if (getUses() >= MAX_FREE){ $("upsell").classList.add("show"); return; }
+
+  startTs = Date.now();
+  $("goBtn").disabled = true;
+  $("progressCard").style.display = "block";
+  $("resultCard").style.display = "none";
+  ["st1","st2","st3","st4"].forEach(id => $(id).className = "step");
+  $("st1").className = "step active";
+  $("st1").innerHTML = `<div class="ico"><div class="spinner"></div></div>上传图片到服务器`;
+
+  const fd = new FormData();
+  pickedFiles.forEach(f => fd.append("files", f));
+
+  try {
+    // 模拟进度推进（真实进度不可见）
+    const tick = setTimeout(() => { $("st1").className = "step done"; $("st1").innerHTML = `<div class="ico">✓</div>上传图片到服务器`; $("st2").className = "step active"; $("st2").innerHTML = `<div class="ico"><div class="spinner"></div></div>视觉大模型识别阅读题（OCR + 结构化）`; }, 200);
+
+    const resp = await fetch("/api/generate", { method:"POST", body: fd });
+    clearTimeout(tick);
+    if (!resp.ok){
+      const err = await resp.json().catch(()=>({detail:"请求失败"}));
+      throw new Error(err.detail || `HTTP ${resp.status}`);
+    }
+    $("st2").className = "step done"; $("st2").innerHTML = `<div class="ico">✓</div>视觉大模型识别阅读题（OCR + 结构化）`;
+    $("st3").className = "step active"; $("st3").innerHTML = `<div class="ico"><div class="spinner"></div></div>渲染成互动讲课件 HTML`;
+    const data = await resp.json();
+    $("st3").className = "step done"; $("st3").innerHTML = `<div class="ico">✓</div>渲染成互动讲课件 HTML`;
+    $("st4").className = "step done"; $("st4").innerHTML = `<div class="ico">✓</div>完成，准备下载`;
+
+    showResult(data);
+    addUse();
+    renderFree();
+  } catch (e){
+    ["st1","st2","st3","st4"].forEach(id => { $(id).classList.remove("active"); });
+    const lastActive = ["st1","st2","st3","st4"].find(id => $(id).classList.contains("active")) || "st1";
+    $(lastActive).className = "step error";
+    $(lastActive).innerHTML = `<div class="ico">!</div>失败：${e.message}`;
+    toast("生成失败：" + e.message);
+  } finally {
+    $("goBtn").disabled = false;
+  }
+};
+
+function showResult(data){
+  $("resultCard").style.display = "block";
+  $("resultCard").scrollIntoView({behavior:"smooth", block:"start"});
+  $("rPassages").textContent = data.passages.length;
+  $("rQs").textContent = data.questions_total;
+  $("rTime").textContent = ((Date.now()-startTs)/1000).toFixed(1) + "s";
+  $("preview").src = data.preview_url;
+  $("dlBtn").href = data.download_url;
+  $("dlBtn").download = "英语阅读互动课件.html";
+  // tags
+  $("rTagA").parentElement.innerHTML = data.passages.map(p=>`<span class="tag">${p} 篇</span>`).join("");
+  if (data.warnings && data.warnings.length){
+    toast("部分图片识别失败：" + data.warnings.join("；"), 4000);
+  }
+}
+
+$("againBtn").onclick = () => {
+  pickedFiles = []; input.value=""; renderThumbs();
+  $("progressCard").style.display = "none";
+  $("resultCard").style.display = "none";
+  document.getElementById("upload").scrollIntoView({behavior:"smooth"});
+};
+
+function toast(msg, ms=2200){
+  const t = $("toast"); t.textContent = msg; t.classList.add("show");
+  clearTimeout(t._timer); t._timer = setTimeout(()=>t.classList.remove("show"), ms);
+}
+</script>
+</body>
+</html>

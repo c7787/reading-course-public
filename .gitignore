@@ -1,0 +1,58 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+env/
+*.egg-info/
+.pytest_cache/
+
+# 环境变量 / Key（绝不进 git）
+.env
+.env.*
+!.env.example
+*.key
+
+# WorkBuddy / Codex 本地辅助
+.workbuddy-ai/
+.claw-daily-*.md
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# 临时产物 / 中间数据（可重新生成）
+/_ocr_result.json
+/_ocr_result.json.bak
+/_ocr_result*.json
+/阅读课件_生成.html
+/阅读课件_生成*.html
+/阅读课件_v1_backup.html
+/*.log
+/logs/
+/tmp/
+
+# Vercel
+.vercel/
+
+# 编辑器
+.vscode/
+.idea/
+*.swp
+*~
+
+# Node（如果有）
+node_modules/
+.npm/
+.npm-global/
+
+# 浏览器测试产物
+/playwright-report/
+/test-results/
+/screenshots/
