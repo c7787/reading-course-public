@@ -41,6 +41,10 @@ env/
 # Vercel
 .vercel/
 
+# 部署产物（可重新生成，不进 git）
+/reading-course-scf.zip
+/deploy-*.zip
+
 # 编辑器
 .vscode/
 .idea/
