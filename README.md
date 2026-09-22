@@ -5,7 +5,7 @@
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-green.svg)](https://www.python.org)
-[![Deploy: Vercel](https://img.shields.io/badge/deploy-Vercel-black.svg)](https://vercel.com)
+[![Deploy: 云函数](https://img.shields.io/badge/deploy-国内云函数-0e8a16.svg)](deploy/CLOUD_FUNCTIONS.md)
 
 ---
 
@@ -141,7 +141,7 @@ uvicorn webapp.app:app --port 8000
 
 - ✅ API key 仅服务端持有，浏览器零泄露
 - ✅ 图片处理完立即丢弃，不落盘（除生成 HTML）
-- ✅ 下载文件 1 小时内过期（Vercel `/tmp/`）
+- ✅ 下载文件落 `/tmp/`（serverless 只读文件系统自动回退），重启即清
 - ✅ IP 软上限 30 次/天防刷
 - ✅ 客户端本地限 3 次免费（可绕过，但 IP 层兜底）
 

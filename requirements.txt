@@ -1,0 +1,5 @@
+# 部署用依赖（云函数/服务器自动安装）。需与 webapp/requirements.txt 保持一致。
+fastapi>=0.110
+uvicorn>=0.27
+python-multipart>=0.0.9
+gunicorn>=21.2

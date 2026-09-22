@@ -15,7 +15,7 @@ gunicorn webapp.app:app -w 2 -k uvicorn.workers.UvicornWorker -b 0.0.0.0:${PORT:
 ```
 
 - 端口：腾讯云 CloudBase 约定 `9000`；阿里云 FC 注入环境变量 `$PORT`（用 `${PORT:-9000}` 兜底）
-- 依赖：平台会按 `webapp/requirements.txt` 自动安装（或手动在控制台装）
+- 依赖：根目录 `requirements.txt`（fastapi / uvicorn / python-multipart / **gunicorn**）由云函数自动安装；`webapp/requirements.txt` 内容相同，供本地开发用
 - 环境变量：在控制台配置 `VISION_API_KEY=你的智谱key`（**不要写进代码**）
 
 ---
