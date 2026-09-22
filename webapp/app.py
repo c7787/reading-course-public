@@ -28,17 +28,20 @@ DAILY_IP_LIMIT   = int(os.environ.get("DAILY_IP_LIMIT", "30"))  # 软上限（�
 FREE_TIER_LIMIT  = int(os.environ.get("FREE_TIER_LIMIT", "3"))   # 客户端免费次数（前端也会用）
 
 STATIC_DIR    = Path(__file__).resolve().parent / "static"
-# Vercel serverless 文件系统只读（除 /tmp/），下载目录切到 /tmp/ 否则写不进去
-if os.environ.get("VERCEL") == "1":
-    DOWNLOADS_DIR = Path("/tmp/webapp-downloads")
-else:
-    DOWNLOADS_DIR = STATIC_DIR / "downloads"
-# 沙箱 shim 对 mkdir(exist_ok=True) 不友好；用存在性检查避开
-if not DOWNLOADS_DIR.exists():
+# serverless 环境（Vercel / 阿里云 FC / 腾讯云等）文件系统只读（除 /tmp/），
+# 下载目录优先用 static/downloads，写不进去时退到 /tmp/（自适应，不依赖特定环境变量）
+DOWNLOADS_DIR = STATIC_DIR / "downloads"
+if not DOWNLOADS_DIR.is_dir():
     try:
-        DOWNLOADS_DIR.mkdir(parents=True)
+        DOWNLOADS_DIR.mkdir(parents=True, exist_ok=True)
     except OSError:
         pass
+try:
+    _t = DOWNLOADS_DIR / ".writetest"
+    _t.write_text("1"); _t.unlink()
+except (OSError, PermissionError):
+    DOWNLOADS_DIR = Path("/tmp/webapp-downloads")
+    DOWNLOADS_DIR.mkdir(parents=True, exist_ok=True)
 
 app = FastAPI(title="英语阅读互动课件生成器", version="1.0")
 
